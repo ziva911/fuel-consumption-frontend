@@ -2,8 +2,8 @@ import { Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import BasePage from "../BasePage/BasePage";
 import { BasePageProperties } from "../BasePage/BasePage";
-import SingleVehiclePage from "../SingleVehiclePage/SingleVehiclePage";
-
+import VehicleModel from "../../../../../backend/api/src/components/vehicle/vehicle.model";
+import VehicleService from "../../Services/VehicleService";
 class VehiclesPageProperties extends BasePageProperties {
   match?: {
     params: {
@@ -14,7 +14,7 @@ class VehiclesPageProperties extends BasePageProperties {
 
 class VehiclesPageState {
   title: string = "";
-  userVehicles: number[] = [];
+  userVehicles: VehicleModel[] = [];
 }
 export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
   state: VehiclesPageState;
@@ -27,53 +27,28 @@ export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
   }
 
   componentDidMount() {
-    this.getVehicleData();
+    this.getAllUserVehicles();
   }
 
   componentDidUpdate(prevProps: VehiclesPageProperties, prevState: VehiclesPageState) {
     if (prevProps.match?.params.vid !== this.props.match?.params.vid) {
-      this.getVehicleData();
+      this.getAllUserVehicles();
     }
   }
 
-  private getVehicleId(): number | null {
-    const vid = Number(this.props.match?.params.vid);
-    return vid ? +vid : null;
-  }
-
-  private getVehicleData() {
-    const vid = this.getVehicleId();
-    if (vid === null) {
+  private getAllUserVehicles() {
+    VehicleService.getAllVehicles().then((res) => {
+      if (res.length === 0) {
+        return this.setState({
+          title: "No vehicles found",
+          userVehicles: [],
+        });
+      }
       this.setState({
-        title: "Sva vozila",
-        userVehicles: [1, 2, 3, 4, 5],
+        title: "All vehicles",
+        userVehicles: res,
       });
-    } else {
-      this.setState({
-        title: "Vozilo " + vid,
-        userVehicles: [vid + 1, vid + 2, vid + 3],
-      });
-    }
-  }
-
-  renderArray(): JSX.Element {
-    return <Container></Container>;
-  }
-
-  showSingleVehicle(): JSX.Element {
-    return <SingleVehiclePage />;
-  }
-
-  showAllVehicles(): JSX.Element {
-    return (
-      <>
-        {this.state.userVehicles.map((vehicle) => (
-          <Row>
-            <Link to={"/vehicle/" + (vehicle ?? "")}>{vehicle}</Link>
-          </Row>
-        ))}
-      </>
-    );
+    });
   }
 
   renderMain(): JSX.Element {
@@ -81,11 +56,17 @@ export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
       <>
         <h1>{this.state.title}</h1>
         <Container>
-          {this.state.userVehicles.map((vehicle) => (
-            <Row>
-              <Link to={"/vehicle/" + vehicle}>Vehicle {vehicle}</Link>
-            </Row>
-          ))}
+          {this.state.userVehicles
+            ? this.state.userVehicles.map((vehicle) => (
+                <Row key={"vehicle-elem-" + vehicle.vehicleId}>
+                  <Link to={"/vehicle/" + vehicle.vehicleId}>
+                    {vehicle.internalName
+                      ? `${vehicle.internalName} (${vehicle.brandModel?.brand?.name} ${vehicle.brandModel?.name})`
+                      : `${vehicle.brandModel?.brand?.name} ${vehicle.brandModel?.name}`}
+                  </Link>
+                </Row>
+              ))
+            : ""}
         </Container>
       </>
     );

@@ -6,6 +6,7 @@ import HomePage from "../HomePage/HomePage";
 import TopMenu from "../TopMenu/TopMenu";
 import "./Application.scss";
 import VehiclesPage from "../VehiclesPage/VehiclesPage";
+import SingleVehiclePage from "../SingleVehiclePage/SingleVehiclePage";
 
 export default function Application() {
   return (
@@ -22,9 +23,17 @@ export default function Application() {
                 Home
               </Route>
               <Route
-                path="/vehicle/:vid?"
+                exact
+                path="/vehicle"
                 render={(props: any) => {
                   return <VehiclesPage {...props}></VehiclesPage>;
+                }}
+              ></Route>
+              <Route
+                exact
+                path="/vehicle/:vid?"
+                render={(props: any) => {
+                  return <SingleVehiclePage {...props}></SingleVehiclePage>;
                 }}
               ></Route>
               <Route exact path="/contact">
