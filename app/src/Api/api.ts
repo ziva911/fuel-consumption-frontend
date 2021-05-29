@@ -13,7 +13,8 @@ export default function api(
     method: ApiMethod,
     path: string,
     role: ApiRole = 'user',
-    body: any | undefined = undefined
+    body: any | undefined = undefined,
+    attemptToRefresh: boolean = false
 ): Promise<ApiResponse> {
     return new Promise<ApiResponse>(resolve => {
         axios(
@@ -24,12 +25,31 @@ export default function api(
                 data: body ? JSON.stringify(body) : '',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': 'Bearer No token'
+                    'Authorization': 'Bearer ' + getAuthToken(role)
                 }
             }
         )
             .then(res => responseHandler(res, resolve))
-            .catch(err => {
+            .catch(async err => {
+                if (attemptToRefresh && ('' + err).includes("401")) {
+                    const newToken: string | null = await refreshToken(role);
+                    if (newToken === null) {
+                        return resolve({
+                            status: 'login',
+                            data: null
+                        })
+                    }
+                    saveAuthToken(role, newToken);
+                    api(method, path, role, body, false)
+                        .then(res => resolve(res))
+                        .catch(() => {
+                            return resolve({
+                                status: 'login',
+                                data: null
+                            })
+                        });
+                    return;
+                }
                 if (err?.response?.status === 401) {
                     return resolve({
                         status: 'login',
@@ -62,4 +82,58 @@ function responseHandler(res: AxiosResponse<any>, resolve: (data: ApiResponse) =
         status: 'ok',
         data: res.data
     })
+}
+
+function getAuthToken(role: ApiRole): string {
+    return localStorage.getItem(role + '-auth-token') ?? '';
+}
+
+function getRefreshToken(role: ApiRole): string {
+    return localStorage.getItem(role + '-refresh-token') ?? '';
+}
+
+export function getIdentity(role: ApiRole): string {
+    return localStorage.getItem(role + '-identity') ?? '';
+}
+
+export function saveAuthToken(role: ApiRole, token: string) {
+    localStorage.setItem(role + '-auth-token', token);
+}
+
+export function saveRefreshToken(role: ApiRole, token: string) {
+    localStorage.setItem(role + '-refresh-token', token);
+}
+
+export function saveIdentity(role: ApiRole, identity: string) {
+    localStorage.setItem(role + '-identity', identity);
+}
+
+function refreshToken(role: ApiRole): Promise<string | null> {
+    return new Promise<string | null>((resolve) => {
+        axios(
+            {
+                method: 'post',
+                baseURL: ApiConfiguration.API_URL,
+                url: `/auth/${role}/refresh`,
+                data: JSON.stringify({
+                    refreshToken: getRefreshToken(role)
+                }),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            }
+        )
+            .then(res => refreshTokenResponseHandler(res, resolve))
+            .catch(err => {
+                resolve(null);
+            })
+    })
+}
+
+function refreshTokenResponseHandler(res: AxiosResponse<any>, resolve: (data: string | null) => void) {
+    if (res.status !== 200) {
+        return resolve(null);
+    }
+
+    resolve(res.data?.authTokenString);
 }
