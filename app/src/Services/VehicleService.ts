@@ -1,5 +1,5 @@
 import VehicleModel from "../../../../backend/api/src/components/vehicle/vehicle.model";
-import api from "../Api/api";
+import api from "../Api/Api";
 
 export default class VehicleService {
     public static getAllVehicles(): Promise<VehicleModel[]> {

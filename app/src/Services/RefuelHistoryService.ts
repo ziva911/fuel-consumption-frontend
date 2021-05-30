@@ -1,5 +1,5 @@
 import RefuelHistory from "../../../../backend/api/src/components/refuel_history/refuel-history.model";
-import api from "../Api/api";
+import api from "../Api/Api";
 
 export default class RefuelHistoryService {
     public static getRefuelHistoryByVehicleId(vehicleId: number): Promise<RefuelHistory[]> {

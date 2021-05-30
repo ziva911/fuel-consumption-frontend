@@ -7,6 +7,7 @@ import TopMenu from "../TopMenu/TopMenu";
 import "./Application.scss";
 import VehiclesPage from "../VehiclesPage/VehiclesPage";
 import SingleVehiclePage from "../SingleVehiclePage/SingleVehiclePage";
+import UserLogin from "../UserLogin/UserLogin";
 
 export default function Application() {
   return (
@@ -42,9 +43,7 @@ export default function Application() {
               <Route exact path="/profile">
                 Profile
               </Route>
-              <Route exact path="/signin">
-                Sign in
-              </Route>
+              <Route exact path="/user/login" component={UserLogin} />
             </Switch>
           </Suspense>
         </div>

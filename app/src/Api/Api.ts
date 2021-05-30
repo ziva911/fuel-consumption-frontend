@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { ApiConfiguration } from '../Config/api.config';
+import EventRegistry from './EventRegistry';
 type ApiMethod = 'get' | 'post' | 'put' | 'delete';
 type ApiRole = 'user' | 'administrator';
 type ApiResponseStatus = 'ok' | 'error' | 'login';
@@ -14,7 +15,7 @@ export default function api(
     path: string,
     role: ApiRole = 'user',
     body: any | undefined = undefined,
-    attemptToRefresh: boolean = false
+    attemptToRefresh: boolean = true
 ): Promise<ApiResponse> {
     return new Promise<ApiResponse>(resolve => {
         axios(
@@ -64,7 +65,7 @@ export default function api(
                 }
                 return resolve({
                     status: 'error',
-                    data: '' + err?.response
+                    data: err?.response
                 })
             })
     })
@@ -72,7 +73,7 @@ export default function api(
 
 
 function responseHandler(res: AxiosResponse<any>, resolve: (data: ApiResponse) => void) {
-    if (res?.status < 200 || res?.status > 300) {
+    if (res?.status < 200 || res?.status >= 300) {
         return resolve({
             status: 'error',
             data: '' + res
