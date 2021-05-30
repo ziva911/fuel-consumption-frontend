@@ -1,9 +1,10 @@
 import { Container, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import BasePage from "../BasePage/BasePage";
 import { BasePageProperties } from "../BasePage/BasePage";
 import VehicleModel from "../../../../../backend/api/src/components/vehicle/vehicle.model";
 import VehicleService from "../../Services/VehicleService";
+import EventRegistry from "../../Api/EventRegistry";
 class VehiclesPageProperties extends BasePageProperties {
   match?: {
     params: {
@@ -15,6 +16,7 @@ class VehiclesPageProperties extends BasePageProperties {
 class VehiclesPageState {
   title: string = "";
   userVehicles: VehicleModel[] = [];
+  isUserLoggedIn: boolean = true;
 }
 export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
   state: VehiclesPageState;
@@ -23,16 +25,26 @@ export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
     this.state = {
       title: "",
       userVehicles: [],
+      isUserLoggedIn: true,
     };
   }
 
   componentDidMount() {
     this.getAllUserVehicles();
+    EventRegistry.off("AUTH_EVENT", this.authEventHandler.bind(this));
   }
 
   componentDidUpdate(prevProps: VehiclesPageProperties, prevState: VehiclesPageState) {
     if (prevProps.match?.params.vid !== this.props.match?.params.vid) {
       this.getAllUserVehicles();
+    }
+  }
+
+  private authEventHandler(status: string) {
+    if (this.state.isUserLoggedIn && ["force_login", "user_login_failed", "user_logout", "administrator_logout"].includes(status)) {
+      this.setState({
+        isUserLoggedIn: false,
+      });
     }
   }
 
@@ -52,6 +64,9 @@ export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
   }
 
   renderMain(): JSX.Element {
+    if (this.state.isUserLoggedIn === false) {
+      return <Redirect to="/user/login" />;
+    }
     return (
       <>
         <h1>{this.state.title}</h1>
