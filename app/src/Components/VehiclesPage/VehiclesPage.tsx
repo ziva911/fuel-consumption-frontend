@@ -1,10 +1,11 @@
-import { Container, Row } from "react-bootstrap";
+import { Button, CardDeck, Col, Container, Row } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import BasePage from "../BasePage/BasePage";
 import { BasePageProperties } from "../BasePage/BasePage";
 import VehicleModel from "../../../../../backend/api/src/components/vehicle/vehicle.model";
 import VehicleService from "../../Services/VehicleService";
 import EventRegistry from "../../Api/EventRegistry";
+import VehiclesArrayElement from "./VehiclesArrayElement/VehiclesArrayElement";
 class VehiclesPageProperties extends BasePageProperties {
   match?: {
     params: {
@@ -71,17 +72,20 @@ export default class VehiclesPage extends BasePage<VehiclesPageProperties> {
       <>
         <h1>{this.state.title}</h1>
         <Container>
-          {this.state.userVehicles
-            ? this.state.userVehicles.map((vehicle) => (
-                <Row key={"vehicle-elem-" + vehicle.vehicleId}>
-                  <Link to={"/vehicle/" + vehicle.vehicleId}>
-                    {vehicle.internalName
-                      ? `${vehicle.internalName} (${vehicle.brandModel?.brand?.name} ${vehicle.brandModel?.name})`
-                      : `${vehicle.brandModel?.brand?.name} ${vehicle.brandModel?.name}`}
-                  </Link>
-                </Row>
-              ))
-            : ""}
+          <Row>
+            <CardDeck className="row">
+              {this.state.userVehicles
+                ? this.state.userVehicles.map((vehicle) => {
+                    return <VehiclesArrayElement key={"vehicle-elem-" + vehicle.vehicleId} vehicle={vehicle} />;
+                  })
+                : ""}
+            </CardDeck>
+            <Col>
+              <Link to={"/vehicle/add"}>
+                <Button>Add new vehicle</Button>
+              </Link>
+            </Col>
+          </Row>
         </Container>
       </>
     );

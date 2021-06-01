@@ -14,10 +14,14 @@ import UserLogout from "../UserLogout/UserLogout";
 import AdministratorLogin from "../AdministratorLogin/AdministratorLogin";
 import AdministratorLogout from "../AdministratorLogout/AdministratorLogout";
 import ProfilePage from "../ProfilePage/ProfilePage";
+import AddVehiclePage from "../AddVehiclePage/AddVehiclePage";
+
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
 }
+
 class ApplicationProperties {}
+
 export default class Application extends Component<ApplicationProperties> {
   state: ApplicationState;
 
@@ -90,6 +94,14 @@ export default class Application extends Component<ApplicationProperties> {
                     return <VehiclesPage {...props} />;
                   }}
                 />
+                <Route
+                  exact
+                  path="/vehicle/edit/:vid?"
+                  render={(props: any) => {
+                    return <AddVehiclePage {...props} />;
+                  }}
+                ></Route>
+                <Route exact path="/vehicle/add" component={AddVehiclePage} />
                 <Route
                   exact
                   path="/vehicle/:vid?"

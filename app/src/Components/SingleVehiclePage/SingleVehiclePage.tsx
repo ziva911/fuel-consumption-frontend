@@ -5,6 +5,9 @@ import BasePage, { BasePageProperties } from "../BasePage/BasePage";
 import "./SingleVehiclePage.scss";
 import VehicleService from "../../Services/VehicleService";
 import RefuelHistoryService from "../../Services/RefuelHistoryService";
+import { ApiConfiguration } from "../../Config/api.config";
+import { getThumbPath } from "../VehiclesPage/VehiclesArrayElement/VehiclesArrayElement";
+import { ReactComponent as DefaultPhoto } from "../../Shared/default_photo.svg";
 class SingleVehiclePageProperties extends BasePageProperties {
   match?: {
     params: {
@@ -75,14 +78,12 @@ export default class SingleVehiclePage extends BasePage<SingleVehiclePagePropert
     RefuelHistoryService.getRefuelHistoryByVehicleId(vehicleId).then((refuelHistory) => {
       if (refuelHistory.length === 0) {
         return this.setState({
-          title: "No refuel history found",
-          vehicleInfo: null,
+          ...this.state,
           refuelHistory: [],
         });
       }
       this.setState({
-        title: this.state.title,
-        vehicleInfo: this.state.vehicleInfo,
+        ...this.state,
         refuelHistory: refuelHistory,
       });
     });
@@ -107,7 +108,7 @@ export default class SingleVehiclePage extends BasePage<SingleVehiclePagePropert
             {vehicle.imagePath ? (
               <Col xs={6} md={4}>
                 <Row>
-                  <Image src={vehicle.imagePath} thumbnail />
+                  <Image src={getThumbPath(ApiConfiguration.UPLOAD_PATH + "/" + vehicle?.imagePath) ?? "../../Shared/default_photo.svg"} />
                 </Row>
                 <Row>
                   <Col>Edit image</Col>
@@ -115,9 +116,9 @@ export default class SingleVehiclePage extends BasePage<SingleVehiclePagePropert
                 </Row>
               </Col>
             ) : (
-              <Col xs={6} md={4}>
+              <Col xs={6} md={4} className="default-photo-container">
                 <Row>
-                  <Image src={"random slika"} thumbnail />
+                  <DefaultPhoto className="default-photo" fill={"" + vehicle.paintColor} viewBox="0 0 1000 800" />
                 </Row>
                 <Row>
                   <Col>Add image</Col>

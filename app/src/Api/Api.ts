@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
 import { ApiConfiguration } from '../Config/api.config';
-import EventRegistry from './EventRegistry';
 type ApiMethod = 'get' | 'post' | 'put' | 'delete';
 type ApiRole = 'user' | 'administrator';
 type ApiResponseStatus = 'ok' | 'error' | 'login';
@@ -23,7 +22,7 @@ export default function api(
                 method: method,
                 baseURL: ApiConfiguration.API_URL,
                 url: path,
-                data: body ? JSON.stringify(body) : '',
+                data: body ? body : null,
                 headers: {
                     'Content-type': 'application/json',
                     'Authorization': 'Bearer ' + getAuthToken(role)

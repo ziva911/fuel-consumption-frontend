@@ -15,13 +15,8 @@ export default class TopMenu extends Component<TopMenuProperties> {
             </Link>
           </Nav.Item>
           <Nav.Item>
-            <Link className="nav-link" to="/dashboard/vehicle">
-              Vehicles
-            </Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Link className="nav-link" to="/dashboard/brand">
-              Brands
+            <Link className="nav-link" to="/dashboard">
+              Dashboard
             </Link>
           </Nav.Item>
           <Nav.Item>
@@ -47,7 +42,12 @@ export default class TopMenu extends Component<TopMenuProperties> {
           </Nav.Item>
           <Nav.Item>
             <Link className="nav-link" to="/vehicle">
-              Vehicle
+              Vehicles
+            </Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Link className="nav-link" to="/contact">
+              Contact
             </Link>
           </Nav.Item>
           <Nav.Item>

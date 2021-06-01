@@ -1,30 +1,48 @@
-import { Component } from "react";
-import { Container } from "react-bootstrap";
-interface Brand {
-  name: string;
-  logo: string;
+import { Card, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import VehicleModel from "../../../../../../backend/api/src/components/vehicle/vehicle.model";
+import * as path from "path";
+import { ApiConfiguration } from "../../../Config/api.config";
+import { ReactComponent as DefaultPhoto } from "../../../Shared/default_photo.svg";
+interface VehiclesArrayElementProperties {
+  vehicle: VehicleModel;
 }
-interface BrandModel {
-  id: number;
-  name: string;
-  brand: Brand | null;
+export function getThumbPath(url: string): string {
+  const directory = path.dirname(url);
+  const extension = path.extname(url);
+  const filename = path.basename(url, extension);
+  return directory + "/" + filename + "-thumb" + extension;
 }
-class VehiclesArrayElementProperties {
-  id: number | null = null;
-  internalName?: string = "";
-  // manufactureYear: number = 1900;
-  // paintColor: string = "gray";
-  // mileageStart: number = 0;
-  // mileageCurrent: number = 0;
-  // createdAt: string = "";
-  // modifiedAt: string = "";
-  // imagePath: string = "";
-  // brandModel: BrandModel | null = null;
-  // fuelType: string = "";
-}
+export default function VehiclesArrayElement(props: VehiclesArrayElementProperties) {
+  return (
+    <Col xs={12} sm={6} md={4} lg={3} className="mt-3">
+      <Card>
+        {props.vehicle.internalName ? (
+          <Link to={"/vehicle/" + props.vehicle.vehicleId}>
+            {props.vehicle.imagePath ? (
+              <Card.Img variant="top" src={getThumbPath(ApiConfiguration.UPLOAD_PATH + "/" + props.vehicle?.imagePath)} />
+            ) : (
+              <DefaultPhoto className="default-photo" fill={"" + props.vehicle.paintColor} viewBox="0 0 1000 800" />
+            )}
+          </Link>
+        ) : (
+          ""
+        )}
+        {props.vehicle.internalName
+          ? `${props.vehicle.internalName} (${props.vehicle.brandModel?.brand?.name} ${props.vehicle.brandModel?.name})`
+          : `${props.vehicle.brandModel?.brand?.name} ${props.vehicle.brandModel?.name}`}
 
-export default class VehiclesArrayElement extends Component<VehiclesArrayElementProperties> {
-  renderMain(): JSX.Element {
-    return <Container className="pageHolder">{"vozilo sa id: " + this.props.id}</Container>;
-  }
+        <Link
+          to={{
+            pathname: "/vehicle/edit/" + props.vehicle.vehicleId,
+            state: {
+              vehicleInfo: props.vehicle,
+            },
+          }}
+        >
+          Edit
+        </Link>
+      </Card>
+    </Col>
+  );
 }

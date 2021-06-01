@@ -12,6 +12,18 @@
         align-items: center;
       }
     }
+    .default-photo-container {
+      & > Row {
+        height: 100%;
+      }
+      display: grid;
+      grid-template-rows: 1fr auto;
+      .default-photo {
+        * {
+          width: 100% !important;
+        }
+      }
+    }
   }
   .refuel-array-container {
     margin-top: 36px;
